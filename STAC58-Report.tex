@@ -86,12 +86,6 @@ The optimal portfolio under this model includes both long and short positions. T
     \item \textbf{Expected Normalized Annual Return:} $\sim 18.64\%$
     \item \textbf{Portfolio Standard Deviation (Risk):} $\sim 0.005342$
 \end{itemize}
-\begin{figure} [h]
-    \centering
-    \includegraphics[width=0.6\linewidth]{Findings_Yutong/weights.png}
-    \caption{Optimal Weights}
-    \label{opt weights}
-\end{figure}
 
 \subsection*{2.  Minimum Variance Portfolio (No Short-Selling)}
 Under the restriction that all portfolio weights must be non-negative, the optimized portfolio yields:
@@ -100,11 +94,21 @@ Under the restriction that all portfolio weights must be non-negative, the optim
     \item \textbf{Expected Normalized Annual Return:} $\sim 16.16\%$
     \item \textbf{Portfolio Standard Deviation (Risk):} $\sim 0.005362$
 \end{itemize}
-\begin{figure}[H]
+\begin{figure}[h]
     \centering
-    \includegraphics[width=0.6\linewidth]{Findings_Yutong/portfolio_weights_plot.png}
-    \caption{Optimal Weights (No Short-Selling)}
-    \label{opt weights no}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Findings_Yutong/weights.png}
+        \caption{Optimal Weights}
+        \label{opt weights}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Findings_Yutong/portfolio_weights_plot.png}
+        \caption{Optimal Weights (No Short-Selling)}
+        \label{opt weights no}
+    \end{minipage}
 \end{figure}
 As expected, the restriction on short-selling increases the portfolio's variance slightly. The return is also marginally lower than the unconstrained portfolio. However, this version is more applicable to risk-averse or institutional investors who are prohibited from short-selling.
 
