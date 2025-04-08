@@ -66,7 +66,7 @@ Two portfolio optimization models were implemented:
 
 \subsubsection*{1. Minimum Variance Portfolio}
 This model minimizes the portfolio variance:
-\[\text{minimize } \mathbf{w^T\Sigma w}\]
+\[\text{min } \mathbf{w^T\Sigma w}\]
 subject to the constraint:
 \[\sum_{i=1}^n w_i=1\]
 where $\mathbf{w}$ is the vector of portfolio weights, and $\mathbf{\Sigma}$ is the sample covariance matrix of returns. Short-selling is allowed in this model, so weights can be negative.
@@ -77,6 +77,53 @@ This model introduces a non-negativity constraint to the previous optimization p
 This formulation prevents short-selling, meaning the investor can only hold long positions in assets.\newline
 Both optimization problems were solved using the solve.QP() function from the quadprog package in R.
 
+\subsubsection*{2.a The mathematics behind no shortselling models}
+The problem statement:
+\[\text{min } \mathbf{w^T\Sigma w}\]
+subject to 
+\[w_i \geq 0 \quad \text{for all i}\]
+\[\sum_{i=1}^n w_i=1\]
+can actually be rewritten in terms of 
+
+\begin{align*}
+\begin{split}
+w^T \Sigma w 
+&= \sum_{i} {\sigma_{i,i} w_i^2} + \sum_{i,j} {w_i \sigma_{i,j} w_j} \\
+&= \sum_{i} {\sigma_{i,i} w_i^2} + \sum_{i,j} {w_i \left (\rho_{i,j}  \sigma_i  \sigma_j \right) w_j}
+\end{split}
+\end{align*}
+
+Let $n$ be the numbers of assets, and define $[n]$ by $\{1,2,..n\}$.
+Understanding the above equation is relevant because given any diagonal term of the covariance matrix, say $\sigma_{i,j}$ for any pair ${i,j} \in[n]$, we know that such term is positive. As well, any $\sigma_{i}$ for arbitrary ${i} \in[n]$, is greater than zero. Given weights are positive, the only elements that can possibly be negative are the correlation terms $\rho_{i,j}$ for ${i,j} \in[n]$. Then when the model tries to minimize $w^T \Sigma w $, those assets which are negatively correlated we expect the model to assign them larger weights. They are "good", because they minimize the above equation with their respective negative correlation.\\
+
+Negatively correlated assets are those assets that respond inversely to each other's change. If we can put it in simple words, it means that when one goes up, we expect the second one to go down and vice versa. Therefore, the model is in "favour" of a diverse range of "behaviours" or assest which do not respond to change in the same way. That is precisely the concept of diversification. As a result, diversification is a natural concept rooted in the mathematics behind the model. Particularly, diversification reduces variance.
+
+As a second point, observe that the efficient frontier reflects those portfolios with maximum return for a given level of risk. As described on (Gundersen, 2022), the equation:
+\begin{equation}
+    w^T \Sigma w
+\end{equation}
+Can also be written as:
+\begin{equation}
+    Var(M) = w^T \Sigma w 
+\end{equation}
+
+Where $Var(M)$ denotes the $variance$ of the portfolio model. With some algebraic manipulations as described on (Gundersen, 2022) it is possible to show
+\begin{equation}
+    Var(M) = Var(M) (E(R)) = w^T \Sigma w = f(E(R))^2 
+\end{equation}
+What this means is, $Var(M)$ can be described as a function of the expected return $E(R)$ and furthermore, it can be expressed as the square of some function $f$. Resembling $x=y^2$. Then it becomes clear why the efficient frontier has such quadratic or parabolic structure.
+
+\subsection*{Expected limitations}
+\begin{itemize}
+    \item The model relies on the assumption that any asset can be characterized through its mean and variance. For example, this would be true if the assets were normally distributed. However, this may not be true if the assets follow a mixed distribution. Knowing statistics like the kurtosis and the skewness of a distribution is relevant in several cases, between many more useful statistics. As a result, the underlying assumption that assets are normally distributed might have important impacts given some data features are being ignored (Gajendrakar, 2022).
+    
+    \item The model predicts the best allocation of weights based on historical data, as a result, it assumes that the future is going to behave almost like the past. This may not hold and events like black swans should be accounted for somehow (Gajendrakar, 2022).
+    
+\end{itemize}
+
+
+
+
 \section{Results and Discussion}
 Two optimal portfolios were computed using the Markowitz mean-variance framework: one allowing short-selling and one prohibiting it. Their expected return and risk characteristics are summarized below.
 \subsection*{1. Minimum Variance Portfolio (with Short-Selling)}
@@ -86,6 +133,12 @@ The optimal portfolio under this model includes both long and short positions. T
     \item \textbf{Expected Normalized Annual Return:} $\sim 18.64\%$
     \item \textbf{Portfolio Standard Deviation (Risk):} $\sim 0.005342$
 \end{itemize}
+\begin{figure} [h]
+    \centering
+    \includegraphics[width=0.6\linewidth]{Findings_Yutong/weights.png}
+    \caption{Optimal Weights}
+    \label{opt weights}
+\end{figure}
 
 \subsection*{2.  Minimum Variance Portfolio (No Short-Selling)}
 Under the restriction that all portfolio weights must be non-negative, the optimized portfolio yields:
@@ -94,21 +147,11 @@ Under the restriction that all portfolio weights must be non-negative, the optim
     \item \textbf{Expected Normalized Annual Return:} $\sim 16.16\%$
     \item \textbf{Portfolio Standard Deviation (Risk):} $\sim 0.005362$
 \end{itemize}
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \begin{minipage}{0.48\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{Findings_Yutong/weights.png}
-        \caption{Optimal Weights}
-        \label{opt weights}
-    \end{minipage}
-    \hfill
-    \begin{minipage}{0.48\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{Findings_Yutong/portfolio_weights_plot.png}
-        \caption{Optimal Weights (No Short-Selling)}
-        \label{opt weights no}
-    \end{minipage}
+    \includegraphics[width=0.6\linewidth]{Findings_Yutong/portfolio_weights_plot.png}
+    \caption{Optimal Weights (No Short-Selling)}
+    \label{opt weights no}
 \end{figure}
 As expected, the restriction on short-selling increases the portfolio's variance slightly. The return is also marginally lower than the unconstrained portfolio. However, this version is more applicable to risk-averse or institutional investors who are prohibited from short-selling.
 
@@ -157,7 +200,9 @@ Earlier in the analysis, the expected normalized annual returns were calculated 
 These values represent theoretical expectations under assumptions of return stationarity and log-normal behavior.\par
 However, the cumulative return plot reflects realized performance over the year. While closely aligned with the expected returns, the cumulative curves account for actual day-to-day compounding and market behavior—thus offering a more intuitive and visual understanding of how the portfolios performed in practice.
 
-\newpage
+
+
+
 
 \begin{spacing}{1.5}
 \begin{thebibliography}{9}
@@ -173,6 +218,11 @@ Markowitz, H. M. (1952). Portfolio selection. \textit{Journal of Finance, 7}(1),
 
 \bibitem{nobel_prize_harry_markowitz}
 Nobel Prize. (1990). The Sveriges Riksbank Prize in Economic Sciences in Memory of Alfred Nobel 1990. In \textit{NobelPrize.org}. Retrieved March 25, 2025, from \url{https://www.nobelprize.org/prizes/economic-sciences/1990/markowitz/facts/}
+\bibitem{model_theory}
+Gajendrakar, P. (2022, October 21). Markowitz Model. \textit{WallStreetMojo}.\url{https://www.wallstreetmojo.com/markowitz-model/}
+
+\bibitem{geometry}
+Gundersen, G. (2022, January 9). Geometry of the Efficient Frontier. \textit{Gregorygundersen.com}.\url{ https://gregorygundersen.com/blog/2022/01/09/geometry-efficient-frontier/}
 
 \end{thebibliography}
 \end{spacing}
