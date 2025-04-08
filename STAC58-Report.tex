@@ -133,12 +133,6 @@ The optimal portfolio under this model includes both long and short positions. T
     \item \textbf{Expected Normalized Annual Return:} $\sim 18.64\%$
     \item \textbf{Portfolio Standard Deviation (Risk):} $\sim 0.005342$
 \end{itemize}
-\begin{figure} [h]
-    \centering
-    \includegraphics[width=0.6\linewidth]{Findings_Yutong/weights.png}
-    \caption{Optimal Weights}
-    \label{opt weights}
-\end{figure}
 
 \subsection*{2.  Minimum Variance Portfolio (No Short-Selling)}
 Under the restriction that all portfolio weights must be non-negative, the optimized portfolio yields:
@@ -147,24 +141,34 @@ Under the restriction that all portfolio weights must be non-negative, the optim
     \item \textbf{Expected Normalized Annual Return:} $\sim 16.16\%$
     \item \textbf{Portfolio Standard Deviation (Risk):} $\sim 0.005362$
 \end{itemize}
-\begin{figure}[H]
+\begin{figure}[h]
     \centering
-    \includegraphics[width=0.6\linewidth]{Findings_Yutong/portfolio_weights_plot.png}
-    \caption{Optimal Weights (No Short-Selling)}
-    \label{opt weights no}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Findings_Yutong/weights.png}
+        \caption{Optimal Weights}
+        \label{opt weights}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Findings_Yutong/portfolio_weights_plot.png}
+        \caption{Optimal Weights (No Short-Selling)}
+        \label{opt weights no}
+    \end{minipage}
 \end{figure}
 As expected, the restriction on short-selling increases the portfolio's variance slightly. The return is also marginally lower than the unconstrained portfolio. However, this version is more applicable to risk-averse or institutional investors who are prohibited from short-selling.
 
 \subsection*{Efficient Frontier}
-A Monte Carlo simulation of 10,000 randomly generated portfolios was conducted to visualize the efficient frontier. The efficient frontier graph displays the risk-return trade-off and confirms that the optimized portfolios lie on the lower edge of the cloud—indicating they are mean-variance efficient.
+A Monte Carlo simulation of 10,000 randomly generated portfolios was conducted to visualize the efficient frontier. The efficient frontier graph displays the risk-return trade-off and confirms that the optimized portfolios lie on the lower edge of the cloud—indicating they are mean-variance efficient.\par
+The orange curve represents the efficient frontier, which consists of all portfolios that provide the highest possible return for a given level of risk, or equivalently, the lowest possible risk for a given level of return. Portfolios on this frontier are considered mean-variance efficient and are preferred over those below it.\par
+The red dot on the far left of the orange curve represents the global minimum variance (GMV) portfolio, which has the lowest possible risk among all feasible portfolios. This portfolio is often used as a reference point in portfolio theory because it minimizes volatility without regard to return.\\
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\linewidth]{Findings_Yutong/efficient_frontier_plot.png}
     \caption{Efficient Frontier}
     \label{eff-fro}
 \end{figure}
-The orange curve represents the efficient frontier, which consists of all portfolios that provide the highest possible return for a given level of risk, or equivalently, the lowest possible risk for a given level of return. Portfolios on this frontier are considered mean-variance efficient and are preferred over those below it.\par
-The red dot on the far left of the orange curve represents the global minimum variance (GMV) portfolio, which has the lowest possible risk among all feasible portfolios. This portfolio is often used as a reference point in portfolio theory because it minimizes volatility without regard to return.\\
 \textbf{Key Observations:}
 \begin{itemize}
     \item All of the simulated portfolios lie below the efficient frontier, indicating suboptimal combinations of risk and return.
@@ -175,17 +179,17 @@ The red dot on the far left of the orange curve represents the global minimum va
 
 \subsection*{Cumulative Return Comparison}
 The cumulative return curves represent the normalized portfolio growth over time, computed by exponentiating the cumulative sum of actual daily log returns. This effectively models how a \$1 investment would evolve over the course of the year, accounting for compound growth.
+The figure above shows the cumulative returns of the two optimized portfolios over the course of 2024:
+\begin{itemize}
+    \item \textbf{Blue Line:} Minimum Variance Portfolio with short-selling allowed.
+    \item \textbf{Red Line:} Minimum Variance Portfolio without short-selling (long-only).
+\end{itemize}
 \begin{figure} [H]
     \centering
     \includegraphics[width=0.6\linewidth]{Findings_Yutong/cumulative_return.png}
     \caption{Cumulative Return}
     \label{cum-return}
 \end{figure}
-The figure above shows the cumulative returns of the two optimized portfolios over the course of 2024:
-\begin{itemize}
-    \item \textbf{Blue Line:} Minimum Variance Portfolio with short-selling allowed.
-    \item \textbf{Red Line:} Minimum Variance Portfolio without short-selling (long-only).
-\end{itemize}
      \paragraph{General Trend:} Both portfolios exhibit a positive growth trend, indicating that the optimized portfolios yielded positive returns over the year. This aligns with the earlier result where both had positive expected annual returns.
     \paragraph{Commonalities:}The two portfolios move in broadly the same direction, reacting similarly to market trends. Both lines show periods of faster and slower growth, reflecting the influence of market-wide factors affecting all assets.
     \paragraph{Differences:} The blue line (with short-selling) generally lies slightly above the red line throughout the year, showing that allowing short-selling resulted in slightly higher cumulative returns. The performance gap widens at certain periods, suggesting that the flexibility to short-sell enabled the portfolio to better adapt to market conditions—especially during downtrends or volatile periods.
