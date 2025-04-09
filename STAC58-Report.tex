@@ -1,4 +1,4 @@
-\documentclass[12pt]{article}
+\documentclass[11pt]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{times}
 \usepackage{natbib}
@@ -6,12 +6,20 @@
 \usepackage{url}
 \setcitestyle{authoryear,open={(},close={)}}
 \onehalfspacing
-\usepackage{graphicx} 
-\usepackage{amsmath}
-\usepackage{amssymb}
+\usepackage{amsmath, amsthm, amssymb, graphicx}
 \usepackage{forest}
 \usepackage{float}
 \usepackage{caption}
+\usepackage{upquote}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{geometry}
+\usepackage{mathtools}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\I}{\mathbb{1}}
+\renewcommand{\P}{\mathbb{P}}
 
 \begin{document}
 
@@ -204,8 +212,89 @@ Earlier in the analysis, the expected normalized annual returns were calculated 
 These values represent theoretical expectations under assumptions of return stationarity and log-normal behavior.\par
 However, the cumulative return plot reflects realized performance over the year. While closely aligned with the expected returns, the cumulative curves account for actual day-to-day compounding and market behavior—thus offering a more intuitive and visual understanding of how the portfolios performed in practice.
 
+\section{When Genius Failed: The Case of LTCM}
+
+    In the mid 90s, a mighty hedge fund named Long-Term Capital Management (LTCM) was generating over 40\% annual returns in its highly-advanced portfolios. In 1998, they collapsed. Now, we look into the how it offers a unique compelling empirical critique of some assumptions that underlay the Markowitz Modern Portfolio Theory or in short, known as MPT. They employed quantitative risk models that were based from MPT to construct enormous money-making portfolios with the use of a little simple mean-variance optimization. Recall the theorem explained previously:
+    \begin{equation}
+        \underset{w}{min}\;\; w^\intercal\Sigma w\;\;\text{ subject to}\;\; \sum_{i=1}^nw_i = 1
+    \end{equation}
+    Notably, these models brought forth the makings of highly leveraged arbitrage strategy with large capital invested. But that, in the end, failed due to some core assumptions of MPT that were violated. 
+
+    \subsection{Normality Assumption}
+    As mentioned previously, MPT assumes that returns (investments) $X_i \sim \N(\mu_i,\sigma^2_i)$. From inspection of a Gaussian curve (bell curve), it is notable that the tails are small which implies that the probability of extreme cases or outcomes are low. This can be represented as such:
+    \begin{equation}
+        \P(|X| > x)\le exp\left(-\frac{x^2}{2\sigma^2}\right)
+    \end{equation}
+    Theoretically, this is sensible, but it fails to highlight what occurs in the real world. This is where empirical return distributions display heavy tails, often following power-law decay.
+    \begin{equation}
+        \P(|X|>x)\sim x^{-\alpha},\;\alpha\in(2, 4)
+    \end{equation}
+
+    \begin{figure}[H]
+        \centering
+        \begin{minipage}{0.35\textwidth}
+            \caption{Graph visualizes the normailty assumption breakdown, in particular as an example, the comparison of normal and t-distribution (df = 3). The t-distribution exhibits heavier tails, reflecting a higher likelihood of extreme returns.}
+            \label{fig:gauss_vs_heavy}
+        \end{minipage}
+        \hfill
+        \begin{minipage}{0.6\textwidth}
+            \includegraphics[width=\linewidth]{Graphs_Chris/gaussvsheavy.png}
+        \end{minipage}
+    \end{figure}
+
+    So as a result, the tail risk is significantly underestimated and almost neglected. In our case with LTCM, they ignored this and it led to catastrophic losses in money when a rare black-swan event occurred - the 1998 Russian default.
+
+    \subsection{Gaussian Value-at-Risk}
+    Under the Gaussian assumption, LTCM applied the usage of Value-at-Risk (VaR).
+    \begin{equation}
+        VaR_\alpha = \mu + z_\alpha\sigma
+    \end{equation}
+    with $z_\alpha$ denoting the standard normal quantile. This methodology in particular, ignores skewness. Thus, under heavy-tailed distributions such as $t$ distributions, the actual loss quantiles deviate very sharply away from normal predictions. Therefore, it renders the VaR unreliable for purposes of risk estimation.
+    
+    \begin{figure}[H]
+        \centering
+        \begin{minipage}{0.6\textwidth}
+            \includegraphics[width=\linewidth]{Graphs_Chris/var.png}
+        \end{minipage}%
+        \hfill
+        \begin{minipage}{0.35\textwidth}
+            \captionof{figure}{This graph illustrates how Gaussian Value-at-Risk (VaR) underestimates extreme losses. The "worst-case" threshold set by normal assumptions is violated frequently under heavy-tailed returns.}
+            \label{fig:var}
+        \end{minipage}
+    \end{figure}
+
+    \subsection{Static Correlation Structure}
+    As explained earlier, MPT-based models assume covariance matrix $\Sigma$ and correlation coefficients $\rho_{i,j}$ are stable so that the portfolio variance is computed as:
+    \begin{equation}
+        Var(M) = w^\intercal\Sigma w = \sum_i w_i^2\sigma_i^2 + \sum_{i\ne j}w_iw_j\rho_i\sigma_i\sigma_j
+    \end{equation}
+    Notice that this formulation does not support any dynamic correlation behavior. So if the market is in stress mode, empirically we see:
+    \begin{equation}
+        \underset{t\rightarrow t^*}{lim} \; \rho_{i,j}(t) \rightarrow 1, \;\forall i,j
+    \end{equation}
+    In other words, the assets become highly correlated and with highly correlation in assets, diversification becomes invalidated. So, the failure to account for this major market shift during the crisis by LTCM's model, led to its entire portfolio displaying positively correlated losses.
+
+    \begin{figure}[H]
+        \centering
+        \begin{minipage}{0.6\textwidth}
+            \includegraphics[width=\linewidth]{Graphs_Chris/rolling_corr.png}
+        \end{minipage}%
+        \hfill
+        \begin{minipage}{0.35\textwidth}
+            \captionof{figure}{Graph simulates how a regime shift (shock point) in a real market crisis causes previously uncorrelated assets to become highly correlated.}
+            \label{fig:rolling_corr}
+        \end{minipage}
+    \end{figure}
+
+    \subsection{Diversification under Leverage Disaster}
+    By assuming low portfolio variance and normally distributed risk, the infamous hedge fund justified the use of a leverage ratio that exceeded 25:1. So, when assumptions were violated, the losses were magnified immensely on a proportional level.
+    \begin{equation}
+        \text{Effective Loss} \propto \text{Leverage} \times \text{Model Error}
+    \end{equation}
+    In the end, LTCM saw around \$4.6 billion USD vanish within weeks of the Russian default. This basically wiped out all its capital. What we see now is that the diversification benefit predicted by MPT models reveal the fragility of static models in a real life non-stationary environment such as the stock market.
 
 
+\newpage
 
 
 \begin{spacing}{1.5}
