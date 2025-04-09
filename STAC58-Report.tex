@@ -9,6 +9,7 @@
 \usepackage{amsmath, amsthm, amssymb, graphicx}
 \usepackage{forest}
 \usepackage{float}
+\usepackage{enumitem}
 \usepackage{caption}
 \usepackage{upquote}
 \usepackage{hyperref}
@@ -134,69 +135,80 @@ What this means is, $Var(M)$ can be described as a function of the expected retu
 
 \section{Results and Discussion}
 Two optimal portfolios were computed using the Markowitz mean-variance framework: one allowing short-selling and one prohibiting it. Their expected return and risk characteristics are summarized below.
+
 \subsection*{1. Minimum Variance Portfolio (with Short-Selling)}
 The optimal portfolio under this model includes both long and short positions. The expected performance metrics are:
-\begin{itemize}
-    \item \textbf{Expected Daily Log Return:} $\sim 0.000678$
-    \item \textbf{Expected Normalized Annual Return:} $\sim 18.64\%$
-    \item \textbf{Portfolio Standard Deviation (Risk):} $\sim 0.005342$
-\end{itemize}
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \includegraphics[width=\linewidth]{Findings_Yutong/weights.png}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \captionof{figure}{
+            Optimal Weights (with Short-Selling).\\[0.5em]
+            \textbf{Expected Daily Log Return:} $\sim 0.000678$\\
+            \textbf{Expected Normalized Annual Return:} $\sim 18.64\%$\\
+            \textbf{Portfolio Standard Deviation (Risk):} $\sim 0.005342$
+        }
+        \label{opt-weights-with}
+    \end{minipage}
+\end{figure}
+
 
 \subsection*{2.  Minimum Variance Portfolio (No Short-Selling)}
 Under the restriction that all portfolio weights must be non-negative, the optimized portfolio yields:
-\begin{itemize}
-    \item \textbf{Expected Daily Log Return:} $\sim 0.000594 $
-    \item \textbf{Expected Normalized Annual Return:} $\sim 16.16\%$
-    \item \textbf{Portfolio Standard Deviation (Risk):} $\sim 0.005362$
-\end{itemize}
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
     \begin{minipage}{0.48\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{Findings_Yutong/weights.png}
-        \caption{Optimal Weights}
-        \label{opt weights}
-    \end{minipage}
+        \includegraphics[width=\linewidth]{Findings_Yutong/portfolio_weights_plot.png}
+    \end{minipage}%
     \hfill
     \begin{minipage}{0.48\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{Findings_Yutong/portfolio_weights_plot.png}
-        \caption{Optimal Weights (No Short-Selling)}
-        \label{opt weights no}
+        \captionof{figure}{
+            Optimal Weights (No Short-Selling).\\[0.5em]
+            \textbf{Expected Daily Log Return:} $\sim 0.000594$\\
+            \textbf{Expected Normalized Annual Return:} $\sim 16.16\%$\\
+            \textbf{Portfolio Standard Deviation (Risk):} $\sim 0.005362$
+        }
+        \label{opt-weights-no}
     \end{minipage}
 \end{figure}
 As expected, the restriction on short-selling increases the portfolio's variance slightly. The return is also marginally lower than the unconstrained portfolio. However, this version is more applicable to risk-averse or institutional investors who are prohibited from short-selling.
 
 \subsection*{Efficient Frontier}
 A Monte Carlo simulation of 10,000 randomly generated portfolios was conducted to visualize the efficient frontier. The efficient frontier graph displays the risk-return trade-off and confirms that the optimized portfolios lie on the lower edge of the cloud—indicating they are mean-variance efficient.\par
-The orange curve represents the efficient frontier, which consists of all portfolios that provide the highest possible return for a given level of risk, or equivalently, the lowest possible risk for a given level of return. Portfolios on this frontier are considered mean-variance efficient and are preferred over those below it.\par
-The red dot on the far left of the orange curve represents the global minimum variance (GMV) portfolio, which has the lowest possible risk among all feasible portfolios. This portfolio is often used as a reference point in portfolio theory because it minimizes volatility without regard to return.\\
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\linewidth]{Findings_Yutong/efficient_frontier_plot.png}
-    \caption{Efficient Frontier}
-    \label{eff-fro}
+    \begin{minipage}{0.6\textwidth}
+        \includegraphics[width=\linewidth]{Findings_Yutong/efficient_frontier_plot.png}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.35\textwidth}
+        \captionof{figure}{Efficient Frontier.\\The orange curve shows the set of mean-variance optimal portfolios, offering maximum return for a given level of risk.\\
+        The red dot represents the Global Minimum Variance (GMV) portfolio, which has the lowest possible risk among all feasible portfolios.}
+        \label{eff-fro}
+    \end{minipage}
 \end{figure}
-\textbf{Key Observations:}
-\begin{itemize}
-    \item All of the simulated portfolios lie below the efficient frontier, indicating suboptimal combinations of risk and return.
-    \item The efficient frontier is upward-sloping and concave, reflecting the trade-off between risk and return: higher expected returns can be achieved, but only at the cost of increased risk.
-    \item Portfolios above the frontier are infeasible under current assumptions and constraints.
-    \item The diversification effect is clearly visible: random combinations tend to reduce overall risk due to the covariance between assets, clustering most portfolios in a dense middle region.
-\end{itemize}
+All of the simulated portfolios lie below the efficient frontier, indicating suboptimal combinations of risk and return. The efficient frontier is upward-sloping and concave, reflecting the trade-off between risk and return: higher expected returns can be achieved, but only at the cost of increased risk. Portfolios above the frontier are infeasible under current assumptions and constraints. The diversification effect is clearly visible: random combinations tend to reduce overall risk due to the covariance between assets, clustering most portfolios in a dense middle region.
 
 \subsection*{Cumulative Return Comparison}
 The cumulative return curves represent the normalized portfolio growth over time, computed by exponentiating the cumulative sum of actual daily log returns. This effectively models how a \$1 investment would evolve over the course of the year, accounting for compound growth.
 The figure above shows the cumulative returns of the two optimized portfolios over the course of 2024:
-\begin{itemize}
-    \item \textbf{Blue Line:} Minimum Variance Portfolio with short-selling allowed.
-    \item \textbf{Red Line:} Minimum Variance Portfolio without short-selling (long-only).
-\end{itemize}
-\begin{figure} [H]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\linewidth]{Findings_Yutong/cumulative_return.png}
-    \caption{Cumulative Return}
-    \label{cum-return}
+    \begin{minipage}{0.55\linewidth}
+        \includegraphics[width=\linewidth]{Findings_Yutong/cumulative_return.png}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.4\linewidth}
+        \captionof{figure}{
+            Cumulative Return.\\[0.5em]
+            \textbf{Blue Line:} Minimum Variance Portfolio with short-selling allowed.\\
+            \textbf{Red Line:} Minimum Variance Portfolio without short-selling (long-only).
+        }
+        \label{cum-return}
+    \end{minipage}
 \end{figure}
      \paragraph{General Trend:} Both portfolios exhibit a positive growth trend, indicating that the optimized portfolios yielded positive returns over the year. This aligns with the earlier result where both had positive expected annual returns.
     \paragraph{Commonalities:}The two portfolios move in broadly the same direction, reacting similarly to market trends. Both lines show periods of faster and slower growth, reflecting the influence of market-wide factors affecting all assets.
@@ -205,12 +217,7 @@ The figure above shows the cumulative returns of the two optimized portfolios ov
 \paragraph{Comparison with Expected Annual Returns:}
 Earlier in the analysis, the expected normalized annual returns were calculated from daily log returns using:
 \[R_{annual}=\exp(252\times \bar{r}_{daily})-1\]
-\begin{itemize}
-    \item For the with-short-selling portfolio, the expected annual return was $\sim 18.64\%$
-    \item For the no-short-selling portfolio, the expected return was $\sim 16.16\%$
-\end{itemize}
-These values represent theoretical expectations under assumptions of return stationarity and log-normal behavior.\par
-However, the cumulative return plot reflects realized performance over the year. While closely aligned with the expected returns, the cumulative curves account for actual day-to-day compounding and market behavior—thus offering a more intuitive and visual understanding of how the portfolios performed in practice.
+These values represent theoretical expectations under assumptions of return stationarity and log-normal behavior. However, the cumulative return plot reflects realized performance over the year. While closely aligned with the expected returns, the cumulative curves account for actual day-to-day compounding and market behavior—thus offering a more intuitive and visual understanding of how the portfolios performed in practice.
 
 \section{When Genius Failed: The Case of LTCM}
 
