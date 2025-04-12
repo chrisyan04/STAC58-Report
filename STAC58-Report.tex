@@ -30,7 +30,7 @@
 \maketitle
 
 \section{Abstract}
-This report provides a comprehensive exploration of the Markowitz Portfolio Model, a cornerstone of Modern Portfolio Theory that fundamentally changed the approach to investment strategy and risk management. The model offers a quantitative method for constructing portfolios that optimize the trade-off between expected return and risk, defined as the variance of returns. The report begins by introducing the theoretical foundations of the model, including key assumptions such as investor rationality and mean-variance preferences. 
+This report provides a comprehensive exploration of the Markowitz Portfolio Model, a cornerstone of Modern Portfolio Theory that fundamentally changed the approach to investment strategy and risk management. The model offers a quantitative method for constructing portfolios that optimize the trade-off between expected return and risk, defined as the variance of returns. The report begins by introducing the theoretical foundations of the model, including key ideas such as investor rationality and mean-variance preferences. A key assumption is made that stock returns are normally distributed; the implications and limitations of this assumption are discussed in detail.
 
 Using both simulated and real financial data, the report then demonstrates how to analyze asset correlations, identify optimal portfolios and construct the efficient frontier. Mathematical tools such as covariance matrices and quadratic optimization are employed to solve for minimum variance portfolios and optimal asset weights under various constraints. Visualizations including efficient frontier plots, are used to highlight the impact of diversification and asset selection on portfolio performance.
 
@@ -73,13 +73,82 @@ The primary purpose of the Markowitz Portfolio Model is to assist investors in c
 This project implements the Markowitz Mean-Variance Optimization framework to construct an optimal portfolio using historical stock data from 10 major publicly traded companies. The primary objective is to identify portfolios with minimum risk under different constraints.
 
 \subsection*{Data Collection and Preprocessing}
-Daily adjusted closing prices were retrieved from Yahoo Finance for the period from January 1, 2024 to January 1, 2025 for the following companies: TSLA, AMZN, META, JNJ, XOM, JPM, KO, INTC, NFLX, and PG. The adjusted prices account for stock splits and dividends, providing a consistent basis for return calculations. \\
+Daily adjusted closing prices were retrieved from Yahoo Finance for the period from January 1, 2024 to January 1, 2025 for the following companies: AMZN, INTC, JNJ, JPM, KO, META, NFLX, PG, TSLA and XOM. The adjusted prices account for stock splits and dividends, providing a consistent basis for return calculations. \\
 The daily logarithmic returns were calculated for each stock using the formula:
 \[R_t=\log \left (\frac{P_t}{P_{t-1}} \right )\]
-These log returns were then cleaned to remove any missing values. Descriptive statistics, such as the mean return (expected return), standard deviation (volatility), correlation, and covariance matrices, were computed and used as inputs to the portfolio optimization problem.
+These log returns were then cleaned to remove any missing values. Let us visualize the log returns as histograms : 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Plots_Gursimar/return_histograms.png}
+    \caption{Log returns}
+    \label{fig:return-histograms}
+\end{figure}
+
+We notice that the returns approximately follow a normal distribution and this will be a fundamental assumption in our model. Therefore now we can use the MLE estimates of mean as sample mean and variance as sample variance to use ahead in our model (In the examples of INTC and META, both have fat tails, this is against our assumption and is discussed in the end). Both the sample estimates are presented below : 
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{lrrrr}
+\hline
+ & Mean Return & Variance & Min Return & Max Return \\
+\hline
+AMZN & 0.00152 & 0.00031 & -0.09195 & 0.07573 \\
+INTC & -0.00341 & 0.00114 & -0.30190 & 0.09065 \\
+JNJ & -0.00028 & 0.00009 & -0.02507 & 0.04457 \\
+JPM & 0.00141 & 0.00022 & -0.06686 & 0.10925 \\
+KO & 0.00028 & 0.00006 & -0.02588 & 0.02474 \\
+META & 0.00211 & 0.00051 & -0.11162 & 0.18497 \\
+NFLX & 0.00256 & 0.00034 & -0.09534 & 0.10514 \\
+PG & 0.00057 & 0.00009 & -0.04964 & 0.04056 \\
+TSLA & 0.00194 & 0.00156 & -0.13164 & 0.19819 \\
+XOM & 0.00033 & 0.00015 & -0.03711 & 0.03134 \\
+\hline
+\end{tabular}
+\caption{Summary Statistics of Daily Returns}
+\label{tab:returns}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Plots_Gursimar/sample_covariance.png}
+    \caption{Sample Covariance Matrix}
+    \label{fig:rsample-covariance}
+\end{figure}
+
+Since we have made a normality assumption, we can also construct 95\% confidence intervals for the mean return of each stock. Stocks that have wider confidence intervals suggest greater uncertainty in the estimate of their mean return, which is often a result of higher volatility. This insight can be useful when comparing assets — tighter intervals indicate more consistent performance, while wider intervals might reflect riskier or more speculative behavior.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{lrrr}
+\hline
+ & Lower Bound & Mean Estimate & Upper Bound \\
+\hline
+AMZN & -0.00067 & 0.00152 & 0.00371 \\
+INTC & -0.00758 & -0.00341 & 0.00076 \\
+JNJ & -0.00144 & -0.00028 & 0.00089 \\
+JPM & -0.00040 & 0.00141 & 0.00323 \\
+KO & -0.00071 & 0.00028 & 0.00127 \\
+META & -0.00067 & 0.00211 & 0.00489 \\
+NFLX & 0.00028 & 0.00256 & 0.00484 \\
+PG & -0.00059 & 0.00057 & 0.00174 \\
+TSLA & -0.00294 & 0.00194 & 0.00682 \\
+XOM & -0.00116 & 0.00033 & 0.00182 \\
+\hline
+\end{tabular}
+\caption{95\% Confidence Intervals for Mean Returns}
+\label{tab:confidence_intervals}
+\end{table}
 
 \subsection*{Portfolio Optimization}
-Two portfolio optimization models were implemented:
+A portfolio is a collection of stocks, bonds, or other securities held by an investor. We assign weights $w_1, w_2 \dots w_n$ to the N assets that have returns $r_1, r_2 \dots r_n$. The goal of a portfolio is to achieve a desired return while minimizing the associated risk. This is called portfolio optimization. 
+\[
+\begin{aligned}
+\text{Portfolio Return:} \quad & R_p = \sum_{i=1}^{n} w_i r_i \\
+\text{Portfolio Variance:} \quad & \sigma_p^2 = \mathbf{w}^T \mathbf{\Sigma} \mathbf{w}
+\end{aligned}
+\]
+where $\mathbf{w}$ is the vector of portfolio weights, and $\mathbf{\Sigma}$ is the sample covariance matrix of returns. We applied two portfolio optimization models :
 
 \subsubsection*{1. Minimum Variance Portfolio}
 This model minimizes the portfolio variance:
